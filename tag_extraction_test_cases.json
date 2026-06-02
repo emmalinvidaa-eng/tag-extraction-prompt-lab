@@ -1,0 +1,1106 @@
+[
+  {
+    "case_id": "TC001",
+    "case_name": "明确结构化信息：驾照、夜班、最快到岗时间",
+    "priority": "P0",
+    "category": "positive_extraction",
+    "tag_dictionary_ids": [
+      "driver_license_type",
+      "accept_night_shift",
+      "arrival_time"
+    ],
+    "input": {
+      "entity_type": "candidate",
+      "candidate_info": {},
+      "current_date": "2026-05-25",
+      "history_messages": [],
+      "current_user_id": "user_001",
+      "entity_id": "cand_001",
+      "candidate_id": "cand_001",
+      "current_job_id": "job_001",
+      "current_job_content": "岗位：网约车司机，要求C1驾照，可接受夜班。",
+      "current_clerk_status": null,
+      "source_system": "c_agent",
+      "source_type": "candidate_dialogue",
+      "conversation_id": "conv_001",
+      "current_message_id": "msg_001",
+      "current_message": "我有C1驾照，夜班也能接受，明天能到岗。",
+      "speaker_role": "candidate",
+      "message_time": "2026-05-25 10:00:00",
+      "existing_tag_values": []
+    },
+    "expected": {
+      "must_include_tags": [
+        {
+          "tag_code": "driver_license_type",
+          "tag_value": "C1",
+          "unstandardized": false,
+          "scope": "global"
+        },
+        {
+          "tag_code": "accept_night_shift",
+          "tag_value": true,
+          "unstandardized": false,
+          "scope": "global"
+        },
+        {
+          "tag_code": "arrival_time",
+          "tag_value": "明天",
+          "unstandardized": false,
+          "scope": "global"
+        }
+      ],
+      "must_not_include_tag_codes": [],
+      "must_include_resolution_actions": []
+    },
+    "judge_focus": "验证模型能从候选人本人表达中抽取结构化事实，且 arrival_time 按字典输出“明天”而不是日期。"
+  },
+  {
+    "case_id": "TC002",
+    "case_name": "无法标准化：C本不能直接写C1/C2",
+    "priority": "P0",
+    "category": "unstandardized",
+    "tag_dictionary_ids": [
+      "driver_license_type",
+      "driving_years"
+    ],
+    "input": {
+      "entity_type": "candidate",
+      "candidate_info": {},
+      "current_date": "2026-05-25",
+      "history_messages": [],
+      "current_user_id": "user_001",
+      "entity_id": "cand_002",
+      "candidate_id": "cand_002",
+      "current_job_id": "job_002",
+      "current_job_content": "岗位：网约车司机，要求C1驾照。",
+      "current_clerk_status": null,
+      "source_system": "c_agent",
+      "source_type": "candidate_dialogue",
+      "conversation_id": "conv_002",
+      "current_message_id": "msg_002",
+      "current_message": "我有C本，开车8年了。",
+      "speaker_role": "candidate",
+      "message_time": "2026-05-25 11:00:00",
+      "existing_tag_values": []
+    },
+    "expected": {
+      "must_include_tags": [
+        {
+          "tag_code": "driver_license_type",
+          "tag_value": null,
+          "unstandardized": true,
+          "raw_value_contains": "C本",
+          "scope": "global"
+        },
+        {
+          "tag_code": "driving_years",
+          "tag_value": 8,
+          "unstandardized": false,
+          "scope": "global"
+        }
+      ],
+      "must_not_include_tags": [
+        {
+          "tag_code": "driver_license_type",
+          "tag_value": "C1"
+        },
+        {
+          "tag_code": "driver_license_type",
+          "tag_value": "C2"
+        }
+      ],
+      "must_include_resolution_actions": []
+    },
+    "judge_focus": "验证“C本”只能标记无法标准化，不能擅自推断为C1或C2；同时能提取驾龄8年。"
+  },
+  {
+    "case_id": "TC003",
+    "case_name": "自我修正：只保留最终期望岗位",
+    "priority": "P0",
+    "category": "self_correction",
+    "tag_dictionary_ids": [
+      "expected_position",
+      "stability"
+    ],
+    "input": {
+      "entity_type": "candidate",
+      "candidate_info": {},
+      "current_date": "2026-05-25",
+      "history_messages": [],
+      "current_user_id": "user_001",
+      "entity_id": "cand_003",
+      "candidate_id": "cand_003",
+      "current_job_id": "job_003",
+      "current_job_content": "当前沟通岗位：保安。",
+      "current_clerk_status": null,
+      "source_system": "c_agent",
+      "source_type": "candidate_dialogue",
+      "conversation_id": "conv_003",
+      "current_message_id": "msg_003",
+      "current_message": "我先看看骑手，不对，还是保安吧，保安稳定点。",
+      "speaker_role": "candidate",
+      "message_time": "2026-05-25 12:00:00",
+      "existing_tag_values": []
+    },
+    "expected": {
+      "must_include_tags": [
+        {
+          "tag_code": "expected_position",
+          "tag_value_contains": "安保-保安",
+          "unstandardized": false,
+          "scope": "global"
+        }
+      ],
+      "must_not_include_tag_values": [
+        {
+          "tag_code": "expected_position",
+          "tag_value_contains": "骑手"
+        }
+      ],
+      "optional_tags": [
+        {
+          "tag_code": "stability"
+        }
+      ],
+      "must_include_resolution_actions": []
+    },
+    "judge_focus": "验证同一句话出现自我修正时，只输出最终表达“保安”，不能同时输出骑手。"
+  },
+  {
+    "case_id": "TC004",
+    "case_name": "家政能力与证书：月嫂/育婴/做饭/住家",
+    "priority": "P0",
+    "category": "multi_tag_extraction",
+    "tag_dictionary_ids": [
+      "has_same_industry_experience",
+      "same_industry_experience_years",
+      "childcare_experience",
+      "can_cook",
+      "infant_care_certificate",
+      "accept_live_in"
+    ],
+    "input": {
+      "entity_type": "candidate",
+      "candidate_info": {},
+      "current_date": "2026-05-25",
+      "history_messages": [],
+      "current_user_id": "user_001",
+      "entity_id": "cand_004",
+      "candidate_id": "cand_004",
+      "current_job_id": "job_004",
+      "current_job_content": "岗位：住家保姆，要求有育儿经验，可住家，会做饭优先。",
+      "current_clerk_status": null,
+      "source_system": "c_agent",
+      "source_type": "candidate_dialogue",
+      "conversation_id": "conv_004",
+      "current_message_id": "msg_004",
+      "current_message": "我做过3年月嫂，也带过宝宝，会做辅食，有育婴师证，可以住家。",
+      "speaker_role": "candidate",
+      "message_time": "2026-05-25 13:00:00",
+      "existing_tag_values": []
+    },
+    "expected": {
+      "must_include_tags": [
+        {
+          "tag_code": "has_same_industry_experience",
+          "tag_value": true,
+          "scope": "global"
+        },
+        {
+          "tag_code": "same_industry_experience_years",
+          "tag_value": 3,
+          "scope": "global"
+        },
+        {
+          "tag_code": "childcare_experience",
+          "tag_value": true,
+          "scope": "global"
+        },
+        {
+          "tag_code": "can_cook",
+          "tag_value": true,
+          "scope": "global"
+        },
+        {
+          "tag_code": "infant_care_certificate",
+          "tag_value": "有",
+          "scope": "global"
+        },
+        {
+          "tag_code": "accept_live_in",
+          "tag_value": true,
+          "scope": "global"
+        }
+      ],
+      "must_include_resolution_actions": []
+    },
+    "judge_focus": "验证一次对话可提取多个明确标签，且证书、经验、能力、意向分别进入正确标签。"
+  },
+  {
+    "case_id": "TC005",
+    "case_name": "负例：Agent话术不能当成候选人事实",
+    "priority": "P0",
+    "category": "negative_agent_statement",
+    "tag_dictionary_ids": [
+      "driver_license_type",
+      "accept_night_shift",
+      "expected_salary"
+    ],
+    "input": {
+      "entity_type": "candidate",
+      "candidate_info": {},
+      "current_date": "2026-05-25",
+      "history_messages": [],
+      "current_user_id": "user_001",
+      "entity_id": "cand_005",
+      "candidate_id": "cand_005",
+      "current_job_id": "job_005",
+      "current_job_content": "岗位：司机。",
+      "current_clerk_status": null,
+      "source_system": "c_agent",
+      "source_type": "candidate_dialogue",
+      "conversation_id": "conv_005",
+      "current_message_id": "msg_005",
+      "current_message": "这个岗位要求C1驾照，可接受夜班，薪资9000，你应该挺合适。",
+      "speaker_role": "agent",
+      "message_time": "2026-05-25 14:00:00",
+      "existing_tag_values": []
+    },
+    "expected": {
+      "must_include_tags": [],
+      "must_not_include_tag_codes": [
+        "driver_license_type",
+        "accept_night_shift",
+        "expected_salary",
+        "arrival_time"
+      ],
+      "must_include_resolution_actions": []
+    },
+    "judge_focus": "验证模型不能把Agent说出的岗位要求或推销话术提取成候选人标签。"
+  },
+  {
+    "case_id": "TC006",
+    "case_name": "负例：候选人提问不等于候选人具备",
+    "priority": "P0",
+    "category": "negative_question",
+    "tag_dictionary_ids": [
+      "driver_license_type",
+      "accept_night_shift",
+      "expected_salary"
+    ],
+    "input": {
+      "entity_type": "candidate",
+      "candidate_info": {},
+      "current_date": "2026-05-25",
+      "history_messages": [],
+      "current_user_id": "user_001",
+      "entity_id": "cand_006",
+      "candidate_id": "cand_006",
+      "current_job_id": "job_006",
+      "current_job_content": "岗位：司机。",
+      "current_clerk_status": null,
+      "source_system": "c_agent",
+      "source_type": "candidate_dialogue",
+      "conversation_id": "conv_006",
+      "current_message_id": "msg_006",
+      "current_message": "你们这个岗位是不是要求C1驾照？夜班多吗？工资是9000吗？",
+      "speaker_role": "candidate",
+      "message_time": "2026-05-25 14:30:00",
+      "existing_tag_values": []
+    },
+    "expected": {
+      "must_include_tags": [],
+      "must_not_include_tag_codes": [
+        "driver_license_type",
+        "accept_night_shift",
+        "expected_salary"
+      ],
+      "must_include_resolution_actions": []
+    },
+    "judge_focus": "验证候选人询问岗位条件时，不能反向推断候选人持有C1、接受夜班或期望9000。"
+  },
+  {
+    "case_id": "TC007",
+    "case_name": "薪资预期与当前岗位薪资冲突",
+    "priority": "P0",
+    "category": "salary_objection",
+    "tag_dictionary_ids": [
+      "expected_salary",
+      "salary_sensitive",
+      "comparison_shopping_tendency"
+    ],
+    "input": {
+      "entity_type": "candidate",
+      "candidate_info": {},
+      "current_date": "2026-05-25",
+      "history_messages": [],
+      "current_user_id": "user_001",
+      "entity_id": "cand_007",
+      "candidate_id": "cand_007",
+      "current_job_id": "job_007",
+      "current_job_content": "岗位：保安，岗位薪资7000元/月。",
+      "current_clerk_status": null,
+      "source_system": "c_agent",
+      "source_type": "candidate_dialogue",
+      "conversation_id": "conv_007",
+      "current_message_id": "msg_007",
+      "current_message": "我期望工资至少8000，7000的话感觉有点低，我还想再看看。",
+      "speaker_role": "candidate",
+      "message_time": "2026-05-25 15:00:00",
+      "existing_tag_values": []
+    },
+    "expected": {
+      "must_include_tags": [
+        {
+          "tag_code": "expected_salary",
+          "tag_value": 8000,
+          "scope": "global"
+        },
+        {
+          "tag_code": "salary_sensitive",
+          "tag_value": true,
+          "scope": "current_job",
+          "current_job_id": "job_007"
+        },
+        {
+          "tag_code": "comparison_shopping_tendency",
+          "tag_value": true,
+          "scope": "current_job",
+          "current_job_id": "job_007"
+        }
+      ],
+      "must_include_resolution_actions": []
+    },
+    "judge_focus": "验证全局期望薪资和当前职位薪资顾虑要拆开：expected_salary 为global，salary_sensitive为current_job。"
+  },
+  {
+    "case_id": "TC008",
+    "case_name": "异议出现：怕被骗/信任度低",
+    "priority": "P0",
+    "category": "objection_appears",
+    "tag_dictionary_ids": [
+      "fraud_concern",
+      "low_trust_anti_fraud_awareness",
+      "extreme_price_sensitive"
+    ],
+    "input": {
+      "entity_type": "candidate",
+      "candidate_info": {},
+      "current_date": "2026-05-25",
+      "history_messages": [],
+      "current_user_id": "user_001",
+      "entity_id": "cand_008",
+      "candidate_id": "cand_008",
+      "current_job_id": "job_008",
+      "current_job_content": "岗位：家政保姆。",
+      "current_clerk_status": null,
+      "source_system": "c_agent",
+      "source_type": "candidate_dialogue",
+      "conversation_id": "conv_008",
+      "current_message_id": "msg_008",
+      "current_message": "我之前被中介骗过，怕你们这个也不正规，会不会收费？",
+      "speaker_role": "candidate",
+      "message_time": "2026-05-25 15:30:00",
+      "existing_tag_values": []
+    },
+    "expected": {
+      "must_include_tags": [
+        {
+          "tag_code": "fraud_concern",
+          "tag_value": true,
+          "scope": "current_job",
+          "current_job_id": "job_008"
+        },
+        {
+          "tag_code": "low_trust_anti_fraud_awareness",
+          "tag_value": true,
+          "scope": "current_job",
+          "current_job_id": "job_008"
+        }
+      ],
+      "optional_tags": [
+        {
+          "tag_code": "extreme_price_sensitive",
+          "tag_value": true
+        }
+      ],
+      "must_include_resolution_actions": []
+    },
+    "judge_focus": "验证怕被骗和反复确认正规/收费的异议类标签；scope应是当前职位。"
+  },
+  {
+    "case_id": "TC009",
+    "case_name": "已有异议被候选人明确解决",
+    "priority": "P0",
+    "category": "objection_resolution_conversation",
+    "tag_dictionary_ids": [
+      "fraud_concern",
+      "high_show_up_willingness",
+      "available_time",
+      "arrival_time"
+    ],
+    "input": {
+      "entity_type": "candidate",
+      "candidate_info": {},
+      "current_date": "2026-05-25",
+      "history_messages": [],
+      "current_user_id": "user_001",
+      "entity_id": "cand_009",
+      "candidate_id": "cand_009",
+      "current_job_id": "job_009",
+      "current_job_content": "岗位：保安。",
+      "current_clerk_status": null,
+      "source_system": "c_agent",
+      "source_type": "candidate_dialogue",
+      "conversation_id": "conv_009",
+      "current_message_id": "msg_009",
+      "current_message": "你们把公司地址和营业执照发我看了，那我就放心了，明天可以过去面试。",
+      "speaker_role": "candidate",
+      "message_time": "2026-05-25 16:00:00",
+      "existing_tag_values": [
+        {
+          "tag_value_id": "tv_009_fraud",
+          "definition_type": "标签",
+          "tag_code": "fraud_concern",
+          "tag_name": "怕被骗",
+          "tag_value": true,
+          "tag_value_status": "current",
+          "scope": "current_job",
+          "current_job_id": "job_009",
+          "evidence": "候选人之前说怕被骗"
+        }
+      ]
+    },
+    "expected": {
+      "must_include_tags": [
+        {
+          "tag_code": "high_show_up_willingness",
+          "tag_value": true,
+          "scope": "current_job",
+          "current_job_id": "job_009"
+        },
+        {
+          "tag_code": "available_time",
+          "raw_value_contains": "明天",
+          "scope": "current_job",
+          "current_job_id": "job_009"
+        }
+      ],
+      "must_include_resolution_actions": [
+        {
+          "action_type": "resolve",
+          "target_tag_value_id": "tv_009_fraud",
+          "tag_code": "fraud_concern"
+        }
+      ],
+      "must_not_include_tag_codes": [
+        "arrival_time"
+      ]
+    },
+    "judge_focus": "验证已有fraud_concern应通过tag_resolution_actions解决；“明天去面试”是面试时间/到场意愿，不是最快到岗时间。"
+  },
+  {
+    "case_id": "TC010",
+    "case_name": "状态已约面不能自动解决怕被骗/薪资敏感",
+    "priority": "P0",
+    "category": "status_no_over_resolution",
+    "tag_dictionary_ids": [
+      "fraud_concern",
+      "salary_sensitive"
+    ],
+    "input": {
+      "entity_type": "candidate",
+      "candidate_info": {},
+      "current_date": "2026-05-25",
+      "history_messages": [],
+      "current_user_id": "user_001",
+      "entity_id": "cand_010",
+      "candidate_id": "cand_010",
+      "current_job_id": "job_010",
+      "current_job_content": "岗位：保姆。",
+      "current_clerk_status": "interviewing",
+      "source_system": "clerk_chat",
+      "source_type": "clerk_chat",
+      "conversation_id": "conv_010",
+      "current_message_id": "msg_010",
+      "current_message": "文员已约候选人明天下午面试。",
+      "speaker_role": "clerk",
+      "message_time": "2026-05-25 16:30:00",
+      "existing_tag_values": [
+        {
+          "tag_value_id": "tv_010_fraud",
+          "tag_code": "fraud_concern",
+          "tag_name": "怕被骗",
+          "tag_value": true,
+          "tag_value_status": "current",
+          "scope": "current_job",
+          "current_job_id": "job_010"
+        },
+        {
+          "tag_value_id": "tv_010_salary",
+          "tag_code": "salary_sensitive",
+          "tag_name": "对薪资异常敏感",
+          "tag_value": true,
+          "tag_value_status": "current",
+          "scope": "current_job",
+          "current_job_id": "job_010"
+        }
+      ]
+    },
+    "expected": {
+      "must_include_tags": [],
+      "must_include_resolution_actions": [],
+      "must_not_resolve_tag_codes": [
+        "fraud_concern",
+        "salary_sensitive"
+      ]
+    },
+    "judge_focus": "验证current_clerk_status=interviewing不能自动解决怕被骗和薪资敏感。"
+  },
+  {
+    "case_id": "TC011",
+    "case_name": "状态待入职可解决当前职位薪资/家庭阻力",
+    "priority": "P1",
+    "category": "status_resolution_pending_onboarding",
+    "tag_dictionary_ids": [
+      "salary_sensitive",
+      "family_resistance"
+    ],
+    "input": {
+      "entity_type": "candidate",
+      "candidate_info": {},
+      "current_date": "2026-05-25",
+      "history_messages": [],
+      "current_user_id": "user_001",
+      "entity_id": "cand_011",
+      "candidate_id": "cand_011",
+      "current_job_id": "job_011",
+      "current_job_content": "岗位：住家保姆，薪资8000。",
+      "current_clerk_status": "pending_onboarding",
+      "source_system": "clerk_chat",
+      "source_type": "clerk_chat",
+      "conversation_id": "conv_011",
+      "current_message_id": "msg_011",
+      "current_message": "文员记录：候选人已确认待入职，薪资和家里都已沟通好。",
+      "speaker_role": "clerk",
+      "message_time": "2026-05-25 17:00:00",
+      "existing_tag_values": [
+        {
+          "tag_value_id": "tv_011_salary",
+          "tag_code": "salary_sensitive",
+          "tag_name": "对薪资异常敏感",
+          "tag_value": true,
+          "tag_value_status": "current",
+          "scope": "current_job",
+          "current_job_id": "job_011"
+        },
+        {
+          "tag_value_id": "tv_011_family",
+          "tag_code": "family_resistance",
+          "tag_name": "家庭阻力",
+          "tag_value": true,
+          "tag_value_status": "current",
+          "scope": "current_job",
+          "current_job_id": "job_011"
+        }
+      ]
+    },
+    "expected": {
+      "must_include_tags": [],
+      "must_include_resolution_actions": [
+        {
+          "action_type": "resolve",
+          "target_tag_value_id": "tv_011_salary",
+          "tag_code": "salary_sensitive"
+        },
+        {
+          "action_type": "resolve",
+          "target_tag_value_id": "tv_011_family",
+          "tag_code": "family_resistance"
+        }
+      ]
+    },
+    "judge_focus": "验证pending_onboarding状态和文员明确记录可解决当前职位相关薪资/家庭阻力。"
+  },
+  {
+    "case_id": "TC012",
+    "case_name": "面试未到：生成到场意愿低并解决原高到场意愿",
+    "priority": "P1",
+    "category": "status_no_show",
+    "tag_dictionary_ids": [
+      "low_show_up_willingness",
+      "high_show_up_willingness"
+    ],
+    "input": {
+      "entity_type": "candidate",
+      "candidate_info": {},
+      "current_date": "2026-05-25",
+      "history_messages": [],
+      "current_user_id": "user_001",
+      "entity_id": "cand_012",
+      "candidate_id": "cand_012",
+      "current_job_id": "job_012",
+      "current_job_content": "岗位：保安。",
+      "current_clerk_status": "no_show",
+      "source_system": "clerk_chat",
+      "source_type": "clerk_chat",
+      "conversation_id": "conv_012",
+      "current_message_id": "msg_012",
+      "current_message": "今天面试未到，电话未接。",
+      "speaker_role": "clerk",
+      "message_time": "2026-05-25 18:00:00",
+      "existing_tag_values": [
+        {
+          "tag_value_id": "tv_012_highshow",
+          "tag_code": "high_show_up_willingness",
+          "tag_name": "到场意愿高",
+          "tag_value": true,
+          "tag_value_status": "current",
+          "scope": "current_job",
+          "current_job_id": "job_012"
+        }
+      ]
+    },
+    "expected": {
+      "must_include_tags": [
+        {
+          "tag_code": "low_show_up_willingness",
+          "tag_value": true,
+          "scope": "current_job",
+          "current_job_id": "job_012"
+        }
+      ],
+      "must_include_resolution_actions": [
+        {
+          "action_type": "resolve",
+          "target_tag_value_id": "tv_012_highshow",
+          "tag_code": "high_show_up_willingness"
+        }
+      ]
+    },
+    "judge_focus": "验证no_show状态可生成低到场意愿，并处理原有高到场意愿这类当前职位阶段性标签。"
+  },
+  {
+    "case_id": "TC013",
+    "case_name": "否定表达：不住家、不夜班",
+    "priority": "P0",
+    "category": "negative_boolean",
+    "tag_dictionary_ids": [
+      "accept_live_in",
+      "accept_night_shift"
+    ],
+    "input": {
+      "entity_type": "candidate",
+      "candidate_info": {},
+      "current_date": "2026-05-25",
+      "history_messages": [],
+      "current_user_id": "user_001",
+      "entity_id": "cand_013",
+      "candidate_id": "cand_013",
+      "current_job_id": "job_013",
+      "current_job_content": "岗位：住家保姆，有夜班。",
+      "current_clerk_status": null,
+      "source_system": "c_agent",
+      "source_type": "candidate_dialogue",
+      "conversation_id": "conv_013",
+      "current_message_id": "msg_013",
+      "current_message": "我不能住家，也接受不了夜班。",
+      "speaker_role": "candidate",
+      "message_time": "2026-05-25 19:00:00",
+      "existing_tag_values": []
+    },
+    "expected": {
+      "must_include_tags": [
+        {
+          "tag_code": "accept_live_in",
+          "tag_value": false,
+          "scope": "global"
+        },
+        {
+          "tag_code": "accept_night_shift",
+          "tag_value": false,
+          "scope": "global"
+        }
+      ],
+      "must_include_resolution_actions": []
+    },
+    "judge_focus": "验证布尔标签支持否定值，不要只提取正向true。"
+  },
+  {
+    "case_id": "TC014",
+    "case_name": "简历解析：基础字段与证书经验",
+    "priority": "P0",
+    "category": "resume_extraction",
+    "tag_dictionary_ids": [
+      "gender",
+      "age",
+      "height_cm",
+      "education_level",
+      "hukou_location",
+      "current_location",
+      "health_certificate",
+      "same_industry_experience_years"
+    ],
+    "input": {
+      "entity_type": "candidate",
+      "candidate_info": {},
+      "current_date": "2026-05-25",
+      "history_messages": [],
+      "current_user_id": "user_001",
+      "entity_id": "cand_014",
+      "candidate_id": "cand_014",
+      "current_job_id": null,
+      "current_job_content": "",
+      "current_clerk_status": null,
+      "source_system": "resume_import",
+      "source_type": "resume",
+      "conversation_id": null,
+      "current_message_id": "resume_014",
+      "current_message": "女，35岁，身高162cm，高中学历，户籍安徽合肥，现居上海浦东，有健康证，做保姆5年。",
+      "speaker_role": "candidate",
+      "message_time": "2026-05-25 09:00:00",
+      "existing_tag_values": []
+    },
+    "expected": {
+      "must_include_tags": [
+        {
+          "tag_code": "gender",
+          "tag_value": "女",
+          "scope": "global"
+        },
+        {
+          "tag_code": "age",
+          "tag_value": 35,
+          "scope": "global"
+        },
+        {
+          "tag_code": "height_cm",
+          "tag_value": 162,
+          "scope": "global"
+        },
+        {
+          "tag_code": "education_level",
+          "tag_value": "高中",
+          "scope": "global"
+        },
+        {
+          "tag_code": "hukou_location",
+          "tag_value_contains": "安徽合肥",
+          "scope": "global"
+        },
+        {
+          "tag_code": "current_location",
+          "tag_value_contains": "上海浦东",
+          "scope": "global"
+        },
+        {
+          "tag_code": "health_certificate",
+          "tag_value": "有",
+          "scope": "global"
+        },
+        {
+          "tag_code": "same_industry_experience_years",
+          "tag_value": 5,
+          "scope": "global"
+        },
+        {
+          "tag_code": "has_same_industry_experience",
+          "tag_value": true,
+          "scope": "global"
+        }
+      ],
+      "must_include_resolution_actions": []
+    },
+    "judge_focus": "验证简历场景可以提取基础字段、地点、证书和行业经验。"
+  },
+  {
+    "case_id": "TC015",
+    "case_name": "人工标签默认忽略",
+    "priority": "P1",
+    "category": "manual_label_ignore",
+    "tag_dictionary_ids": [
+      "manual_candidate_labels",
+      "custom_auto_rule_label"
+    ],
+    "input": {
+      "entity_type": "candidate",
+      "candidate_info": {},
+      "current_date": "2026-05-25",
+      "history_messages": [],
+      "current_user_id": "user_001",
+      "entity_id": "cand_015",
+      "candidate_id": "cand_015",
+      "current_job_id": "job_015",
+      "current_job_content": "岗位：配送员。",
+      "current_clerk_status": null,
+      "source_system": "clerk_chat",
+      "source_type": "clerk_chat",
+      "conversation_id": "conv_015",
+      "current_message_id": "msg_015",
+      "current_message": "这是我自己的备注：先加个人标签“重点跟进”。",
+      "speaker_role": "clerk",
+      "message_time": "2026-05-25 20:00:00",
+      "existing_tag_values": []
+    },
+    "expected": {
+      "must_include_tags": [],
+      "must_not_include_tag_codes": [
+        "manual_candidate_labels",
+        "custom_auto_rule_label"
+      ],
+      "must_include_resolution_actions": []
+    },
+    "judge_focus": "验证manual_defined和creator_only类标签默认不由AI自动提取。"
+  },
+  {
+    "case_id": "TC016",
+    "case_name": "保安关键条件：无纹身无案底有保安证可站岗",
+    "priority": "P0",
+    "category": "security_requirements",
+    "tag_dictionary_ids": [
+      "tattoo_status",
+      "criminal_record",
+      "security_guard_certificate",
+      "accept_long_standing"
+    ],
+    "input": {
+      "entity_type": "candidate",
+      "candidate_info": {},
+      "current_date": "2026-05-25",
+      "history_messages": [],
+      "current_user_id": "user_001",
+      "entity_id": "cand_016",
+      "candidate_id": "cand_016",
+      "current_job_id": "job_016",
+      "current_job_content": "岗位：保安，要求无纹身无案底，有保安证，能长时间站立。",
+      "current_clerk_status": null,
+      "source_system": "c_agent",
+      "source_type": "candidate_dialogue",
+      "conversation_id": "conv_016",
+      "current_message_id": "msg_016",
+      "current_message": "我没有纹身，也没有案底，有保安证，站岗没问题。",
+      "speaker_role": "candidate",
+      "message_time": "2026-05-25 21:00:00",
+      "existing_tag_values": []
+    },
+    "expected": {
+      "must_include_tags": [
+        {
+          "tag_code": "tattoo_status",
+          "tag_value_contains": "无",
+          "scope": "global"
+        },
+        {
+          "tag_code": "criminal_record",
+          "tag_value": false,
+          "scope": "global"
+        },
+        {
+          "tag_code": "security_guard_certificate",
+          "tag_value": "有",
+          "scope": "global"
+        },
+        {
+          "tag_code": "accept_long_standing",
+          "tag_value": true,
+          "scope": "global"
+        }
+      ],
+      "must_include_resolution_actions": []
+    },
+    "judge_focus": "验证对象/布尔/枚举标签混合提取，尤其无案底应输出false。"
+  },
+  {
+    "case_id": "TC017",
+    "case_name": "文员记录：电话接受度高、回消息快",
+    "priority": "P1",
+    "category": "clerk_observation",
+    "tag_dictionary_ids": [
+      "high_phone_acceptance",
+      "fast_message_reply"
+    ],
+    "input": {
+      "entity_type": "candidate",
+      "candidate_info": {},
+      "current_date": "2026-05-25",
+      "history_messages": [],
+      "current_user_id": "user_001",
+      "entity_id": "cand_017",
+      "candidate_id": "cand_017",
+      "current_job_id": "job_017",
+      "current_job_content": "岗位：家政。",
+      "current_clerk_status": null,
+      "source_system": "clerk_chat",
+      "source_type": "clerk_chat",
+      "conversation_id": "conv_017",
+      "current_message_id": "msg_017",
+      "current_message": "候选人电话接听积极，聊了十分钟，微信基本秒回。",
+      "speaker_role": "clerk",
+      "message_time": "2026-05-25 22:00:00",
+      "existing_tag_values": []
+    },
+    "expected": {
+      "must_include_tags": [
+        {
+          "tag_code": "high_phone_acceptance",
+          "tag_value": true,
+          "scope": "current_job"
+        },
+        {
+          "tag_code": "fast_message_reply",
+          "tag_value": true,
+          "scope": "current_job"
+        }
+      ],
+      "must_include_resolution_actions": []
+    },
+    "judge_focus": "验证文员明确记录的沟通事实可以提取为转化上下文标签。"
+  },
+  {
+    "case_id": "TC018",
+    "case_name": "家人未商量不是家庭阻力",
+    "priority": "P0",
+    "category": "family_support_not_resistance",
+    "tag_dictionary_ids": [
+      "can_work_weekends",
+      "family_support_status",
+      "family_resistance"
+    ],
+    "input": {
+      "entity_type": "candidate",
+      "candidate_info": {},
+      "current_date": "2026-05-25",
+      "history_messages": [],
+      "current_user_id": "user_001",
+      "entity_id": "cand_018",
+      "candidate_id": "cand_018",
+      "current_job_id": "job_018",
+      "current_job_content": "岗位：住家保姆。",
+      "current_clerk_status": null,
+      "source_system": "c_agent",
+      "source_type": "candidate_dialogue",
+      "conversation_id": "conv_018",
+      "current_message_id": "msg_018",
+      "current_message": "周末可以上班，家里还没商量，可能要跟老公确认一下。",
+      "speaker_role": "candidate",
+      "message_time": "2026-05-25 23:00:00",
+      "existing_tag_values": []
+    },
+    "expected": {
+      "must_include_tags": [
+        {
+          "tag_code": "can_work_weekends",
+          "tag_value": true,
+          "scope": "global"
+        },
+        {
+          "tag_code": "family_support_status",
+          "tag_value": "未商量",
+          "scope": "global"
+        }
+      ],
+      "must_not_include_tag_codes": [
+        "family_resistance"
+      ],
+      "must_include_resolution_actions": []
+    },
+    "judge_focus": "验证“未商量/需确认”是family_support_status，不应直接判断家庭阻力。"
+  },
+  {
+    "case_id": "TC019",
+    "case_name": "同轮异议最终接受：夜班从不接受改为接受",
+    "priority": "P0",
+    "category": "same_turn_resolution_final_expression",
+    "tag_dictionary_ids": [
+      "accept_night_shift"
+    ],
+    "input": {
+      "entity_type": "candidate",
+      "candidate_info": {},
+      "current_date": "2026-05-25",
+      "history_messages": [],
+      "current_user_id": "user_001",
+      "entity_id": "cand_019",
+      "candidate_id": "cand_019",
+      "current_job_id": "job_019",
+      "current_job_content": "岗位：保安，夜班有补贴。",
+      "current_clerk_status": null,
+      "source_system": "c_agent",
+      "source_type": "candidate_dialogue",
+      "conversation_id": "conv_019",
+      "current_message_id": "msg_019",
+      "current_message": "夜班我一开始不太行，不过你说有补贴，那可以接受。",
+      "speaker_role": "candidate",
+      "message_time": "2026-05-26 09:00:00",
+      "existing_tag_values": [
+        {
+          "tag_value_id": "tv_019_night",
+          "tag_code": "accept_night_shift",
+          "tag_name": "是否接受夜班",
+          "tag_value": false,
+          "tag_value_status": "current",
+          "scope": "global"
+        }
+      ]
+    },
+    "expected": {
+      "must_include_tags": [
+        {
+          "tag_code": "accept_night_shift",
+          "tag_value": true,
+          "scope": "global"
+        }
+      ],
+      "must_not_include_tags": [
+        {
+          "tag_code": "accept_night_shift",
+          "tag_value": false
+        }
+      ],
+      "must_include_resolution_actions": []
+    },
+    "judge_focus": "验证同轮表达以最终态为准，输出接受夜班true，不要保留前半句false。"
+  },
+  {
+    "case_id": "TC020",
+    "case_name": "企业话术不能当成候选人事实",
+    "priority": "P0",
+    "category": "negative_company_statement",
+    "tag_dictionary_ids": [
+      "driver_license_type",
+      "health_certificate",
+      "accept_night_shift"
+    ],
+    "input": {
+      "entity_type": "candidate",
+      "candidate_info": {},
+      "current_date": "2026-05-25",
+      "history_messages": [],
+      "current_user_id": "user_001",
+      "entity_id": "cand_020",
+      "candidate_id": "cand_020",
+      "current_job_id": "job_020",
+      "current_job_content": "岗位：司机。",
+      "current_clerk_status": null,
+      "source_system": "b_agent",
+      "source_type": "company_dialogue",
+      "conversation_id": "conv_020",
+      "current_message_id": "msg_020",
+      "current_message": "我们要求候选人有C1驾照，最好有健康证，能接受夜班。",
+      "speaker_role": "company",
+      "message_time": "2026-05-26 10:00:00",
+      "existing_tag_values": []
+    },
+    "expected": {
+      "must_include_tags": [],
+      "must_not_include_tag_codes": [
+        "driver_license_type",
+        "health_certificate",
+        "accept_night_shift"
+      ],
+      "must_include_resolution_actions": []
+    },
+    "judge_focus": "验证entity_type=candidate时，企业岗位要求不能写成候选人标签。"
+  }
+]

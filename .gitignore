@@ -1,0 +1,14 @@
+node_modules/
+.next/
+.env
+.env.local
+data/*.db
+data/*.db-*
+npm-debug.log*
+*.tsbuildinfo
+.DS_Store
+
+# Local product and development documents are intentionally excluded from the public repository.
+prd.txt
+人才库标签体系@孟超.pdf
+docs/

@@ -1,0 +1,72 @@
+:root {
+  color-scheme: light;
+  font-family: Arial, "PingFang SC", sans-serif;
+  background: #f6f7f9;
+  color: #1f2937;
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; }
+a { color: #155eef; text-decoration: none; }
+button, input, textarea, select { font: inherit; }
+button {
+  cursor: pointer;
+  border: 0;
+  border-radius: 6px;
+  padding: 9px 14px;
+  background: #155eef;
+  color: white;
+}
+button.secondary { background: #e8edfa; color: #234; }
+button.danger { background: #c4320a; }
+header { background: #172554; color: white; padding: 18px 28px; }
+header h1 { font-size: 20px; margin: 0 0 12px; }
+nav { display: flex; gap: 18px; flex-wrap: wrap; }
+nav a { color: #dbeafe; }
+main { max-width: 1280px; margin: 0 auto; padding: 24px; }
+h2 { margin-top: 0; }
+.card {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  margin-bottom: 18px;
+  padding: 18px;
+}
+.grid { display: grid; gap: 14px; }
+.grid.two { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+label { display: grid; gap: 6px; font-size: 14px; }
+input, textarea, select {
+  width: 100%;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  padding: 9px;
+  background: white;
+}
+textarea { min-height: 160px; resize: vertical; }
+table { border-collapse: collapse; width: 100%; background: white; }
+th, td {
+  border-bottom: 1px solid #e5e7eb;
+  padding: 10px 8px;
+  text-align: left;
+  vertical-align: top;
+  font-size: 13px;
+}
+th { color: #475569; background: #f8fafc; }
+.muted { color: #64748b; font-size: 13px; }
+.error { color: #b42318; white-space: pre-wrap; }
+.success { color: #027a48; }
+.actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.badge { border-radius: 999px; padding: 3px 8px; background: #e2e8f0; font-size: 12px; }
+.PASS { background: #dcfae6; color: #067647; }
+.PARTIAL { background: #fef0c7; color: #b54708; }
+.FAIL { background: #fee4e2; color: #b42318; }
+pre {
+  white-space: pre-wrap;
+  word-break: break-word;
+  background: #f8fafc;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  padding: 12px;
+  max-height: 480px;
+  overflow: auto;
+}
