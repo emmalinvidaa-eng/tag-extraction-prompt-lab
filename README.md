@@ -20,7 +20,7 @@
 ## 安装
 
 ```bash
-git clone https://github.com/<your-account>/tag-extraction-prompt-lab.git
+git clone https://github.com/emmalinvidaa-eng/tag-extraction-prompt-lab.git
 cd tag-extraction-prompt-lab
 npm install
 ```
