@@ -94,15 +94,37 @@ POST {base_url}/chat/completions
 7. 点击「开始批量运行」。
 8. 打开「测试结果」，查看汇总和单条 case 详情。
 
+## 同步评测标签到 Supabase 人才库
+
+运行完成后，运行详情页会显示「同步到人才库」按钮。点击后，系统会把本次 run 中 JSON 合法且 Judge 为 `PASS` / `PARTIAL` 的提取结果写入 Supabase `candidate_talent` 表。
+
+需要在 `.env.local` 配置：
+
+```bash
+SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_SERVICE_ROLE_KEY=
+```
+
+也可以直接配置完整 REST 地址：
+
+```bash
+SUPABASE_REST_URL=https://your-project.supabase.co/rest/v1/candidate_talent
+SUPABASE_SERVICE_ROLE_KEY=
+```
+
+同步匹配规则：
+
+- 优先使用测试 case 的 `source_session_id` 匹配 `candidate_talent.external_userid`。
+- 历史已导入测试集如果没有单独保存 `source_session_id`，会回退使用 `input_json.source_session_id`，再回退使用 `input_json.conversation_id`。
+- `gender`、`age`、`hukou_location`、`current_location`、`height_cm`、`driver_license_type`、`driving_years`、`marital_status`、`work_experience_years`、`education_level`、`is_currently_employed` 会直接写入同名字段。
+- 其他标签会按 `tag_code` 合并写入 `candidate_tags` JSON 对象，并保留 `value`、`raw_value`、`confidence`、`run_id`、`case_id`、`source_session_id` 和 `synced_at`。
+- 本次未提取到的字段不会被清空；重复点击会覆盖本次涉及的字段和 `candidate_tags` 中相同 `tag_code`。
+
+`SUPABASE_SERVICE_ROLE_KEY` 权限很高，只能放在本地 `.env.local`，不要提交到仓库或写到前端代码里。
+
 ## 测试数据
 
-仓库附带示例数据：
-
-- `C标签表-一期 (1).xlsx`
-- `tag_extraction_test_cases.jsonl`
-- `tag_extraction_test_cases.json`
-- `tag_extraction_test_cases.xlsx`
-- `tag_extraction_inputs_only.jsonl`
+仓库不包含任何测试数据、示例数据、评测结果或业务文档。请在本地页面上传自己的标签字典和测试集。
 
 Excel 测试集会读取 `TestCases` sheet。若包含 `JudgePrompt` sheet，系统会同步导入并启用该评审提示词。
 

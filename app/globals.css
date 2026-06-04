@@ -19,6 +19,14 @@ button {
 }
 button.secondary { background: #e8edfa; color: #234; }
 button.danger { background: #c4320a; }
+.button {
+  display: inline-block;
+  border-radius: 6px;
+  padding: 9px 14px;
+  background: #155eef;
+  color: white;
+}
+.button.secondary { background: #e8edfa; color: #234; }
 header { background: #172554; color: white; padding: 18px 28px; }
 header h1 { font-size: 20px; margin: 0 0 12px; }
 nav { display: flex; gap: 18px; flex-wrap: wrap; }

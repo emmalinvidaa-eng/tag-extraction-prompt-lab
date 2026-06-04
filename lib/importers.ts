@@ -5,6 +5,7 @@ import JSZip from "jszip";
 type TestCaseInput = {
   case_id: string;
   case_name: string;
+  source_session_id?: string;
   priority?: string;
   category?: string;
   tag_dictionary_ids?: string[];
@@ -203,6 +204,11 @@ function normalizeCase(raw: Record<string, unknown>): TestCaseInput {
   return {
     case_id: String(raw.case_id),
     case_name: String(raw.case_name),
+    source_session_id:
+      cleanValue(raw.source_session_id) ??
+      cleanValue(input.source_session_id) ??
+      cleanValue(input.conversation_id) ??
+      undefined,
     priority: raw.priority ? String(raw.priority) : undefined,
     category: raw.category ? String(raw.category) : undefined,
     tag_dictionary_ids: tagDictionaryIds,

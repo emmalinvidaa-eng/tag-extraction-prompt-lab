@@ -47,6 +47,19 @@ function judgeReason(judgeJson: JsonObject | null) {
     : null;
 }
 
+function judgeScore(judgeJson: JsonObject | null, result: "PASS" | "PARTIAL" | "FAIL") {
+  const rawScore = typeof judgeJson?.score === "number" ? judgeJson.score : null;
+  const score = rawScore === null ? null : Math.max(0, Math.min(100, rawScore));
+
+  if (result === "PASS") {
+    return score !== null && score >= 90 ? score : 95;
+  }
+  if (result === "PARTIAL") {
+    return score !== null && score >= 50 && score <= 89 ? score : 75;
+  }
+  return score !== null && score <= 49 ? score : 20;
+}
+
 export async function executeRun(runId: number) {
   const run = db.prepare("SELECT * FROM test_runs WHERE id = ?").get(runId) as {
     dataset_id: number;
@@ -148,7 +161,7 @@ export async function executeRun(runId: number) {
         judgeRaw,
         judgeJson ? JSON.stringify(judgeJson) : null,
         normalizedJudgeResult,
-        typeof judgeJson?.score === "number" ? judgeJson.score : null,
+        judgeScore(judgeJson, normalizedJudgeResult),
         resultValue(judgeReason(judgeJson)),
         Date.now() - started,
         errorMessage,

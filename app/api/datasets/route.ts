@@ -29,15 +29,16 @@ export async function POST(request: Request) {
         .run(String(form.get("name") || file.name), file.name);
       const statement = db.prepare(
         `INSERT INTO test_cases (
-          dataset_id, case_id, case_name, priority, category,
+          dataset_id, case_id, case_name, source_session_id, priority, category,
           tag_dictionary_ids_json, input_json, expected_json, judge_focus, forbidden_json
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       );
       for (const item of parsed.cases) {
         statement.run(
           dataset.lastInsertRowid,
           item.case_id,
           item.case_name,
+          item.source_session_id ?? null,
           item.priority ?? null,
           item.category ?? null,
           JSON.stringify(item.tag_dictionary_ids ?? []),

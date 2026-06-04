@@ -16,6 +16,7 @@ export type TestCase = {
   id: number;
   case_id: string;
   case_name: string;
+  source_session_id: string | null;
   priority: string | null;
   category: string | null;
   tag_dictionary_ids_json: string;
